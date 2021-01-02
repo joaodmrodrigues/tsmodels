@@ -1,0 +1,10 @@
+Package: tsmodels
+Type: Package
+Title: Time-series models
+Version: 0.1.0
+Author: Joao Rodrigues
+Maintainer: Joao Rodrigues <joao.d.marques.rodrigues@gmail.com>
+Description: Implements several families of time-series models.
+License: MIT
+Encoding: UTF-8
+LazyData: true
