@@ -1,0 +1,87 @@
+---
+title: "Ornstein-Uhlenbeck process"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Ornstein-Uhlenbeck process}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4) 
+```
+
+This document describes the fundamentals of the Ornstein-Uhlenbeck (OU) process and and its implementation in the **tsmodels** package.
+
+The Ornstein-Uhlenbeck (OU) is the canonical model of a mean-reverting stochastic process. It is stationary, Gaussian and Markov. Mathematically, we can define the OU process via the Langevin stochastic differential equation
+$$dY = - \frac{(Y-\mu)}{\tau}dt + \sigma \sqrt{\frac{2}{\tau}} dW.$$
+Here, $Y(t)$ is the stochastic process, $\mu$ and $\sigma$ the process mean and standard deviation, respectively, and $W$ is a Brownian motion (or Wiener process). The first term on the r.h.s. is deterministic, describing damping, or reversion to the mean, while the second term describes the stochastic component.
+
+Here, we integrate the above stochastic differential equation using the Euler-Maruyama method, which is essentially a generalization of the Euler method, but capable of dealing with Brownian motion terms. In general, the solution to a general equation of the form
+$$ dY = a(t,Y)dt + b(t,Y)dW$$
+can be approximated by
+$$Y_{t+dt} = Y_t + dY = Y_t + a(t, Y_t)dt + b(t, Y_t)\sqrt{dt} \xi, $$
+where $\xi \sim N(0,1)$ is a random normal variable of zero mean and unit variance. The $\sqrt{dt}$ factor simply scales the variance of the Brownian motion term. Remember that, Brownian motion is defined such that its infinitesimal increments have mean zero and variance $dt$ (or standard deviation $\sqrt{dt}$).
+
+Let's see how to generate realizations of the OU process:
+
+```{r, echo=TRUE}
+library(tsmodels)
+
+N <- 1000
+sigma <- 1
+mu <- 100
+tau <- 20
+Y0 <- 50
+
+result <- Ornstein_Uhlenbeck(N=N, sigma=sigma, mu=mu, tau=tau, Y0=Y0)
+t1 <- result[[1]]
+Y1 <- result[[2]]
+length(Y1)
+```
+
+Let's plot the results. We need to load tidyverse to use ggplot2
+
+```{r echo=TRUE, message=FALSE}
+library(tidyverse)
+```
+
+```{r, echo=TRUE}
+ggplot()+
+    geom_line(mapping = aes(x=t1, y=Y1), color="black")
+```
+
+There is a transient regime, given that we initialize the integration with a value very far from the process mean. After the damping time of approximately $\tau$, the process becomes stationary. We can check the process statistics now. Let's consider the case where the initial condition is equal to the process mean, to avoid the initial transient regime:
+
+```{r, echo=TRUE}
+Y0 <- 100
+
+result <- Ornstein_Uhlenbeck(N=N, sigma=sigma, mu=mu, tau=tau, Y0=Y0)
+t2 <- result[[1]]
+Y2 <- result[[2]]
+```
+
+```{r, echo=TRUE}
+ggplot()+
+    geom_line(mapping = aes(x=t2, y=Y2), color="black")
+```
+
+Let's confirm the mean and standard deviation of the process:
+
+```{r, echo=TRUE}
+print(mean(Y2))
+print(sd(Y2))
+```
+
+These are consistent with the model parameters, with the deviations coming from normal sample fluctuations. Let's also check if the statistics of the process are normal (Gaussian), using a qq plot, showing theoretical (for a normal distribution) vs sample quantiles:
+
+```{r, echo=TRUE}
+ggplot(mapping=aes(sample=Y2))+
+  stat_qq()+
+  stat_qq_line()
+```
+
+Again, the statistics of the process are essentially Gaussian.
+
