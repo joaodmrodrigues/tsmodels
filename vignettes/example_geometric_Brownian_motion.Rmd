@@ -1,6 +1,9 @@
 ---
 title: "Geometric Brownian motion"
-output: rmarkdown::html_vignette
+#output: rmarkdown::html_vignette
+output: 
+  html_document:
+    keep_md: true
 vignette: >
   %\VignetteIndexEntry{Geometric Brownian motion}
   %\VignetteEngine{knitr::rmarkdown}
