@@ -1,0 +1,78 @@
+---
+title: "Geometric Brownian motion"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Geometric Brownian motion}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4) 
+```
+
+This document describes the fundamentals of geometric Brownian motion and its implementation in the **tsmodels** package.
+
+The geometric Brownian motion is often taken as the standard model of stocks and other financial instruments.
+It is also one of the building blocks of the Black-Scholes option pricing model. 
+It is non-stationary Markov process, with the property of returns being normally distributed, which results a log-normal distribution for the price series.  
+Mathematically, we can define geometric Brownian motion as
+$$dY_t = \mu Y_t dt + \sigma Y_t dW_t.$$
+Here, $Y_t = Y(t)$ is the geometric Brownian motion path, $\mu$ and $\sigma$ the mean and standard deviation of the returns, respectively, and $W$ is a Brownian motion (or Wiener process). The first term on the r.h.s. is deterministic, describing drift, while the second term describes the stochastic component.
+
+It$\hat{\mathrm{o}}$ lemma allows us to write a formal solution to the stochastic differential equation above as
+$$Y_t = Y_0 \mathrm{exp} \lbrace \left( \mu - \frac{\sigma^2}{2} \right)t + \sigma W_t  \rbrace.$$
+The solution above is then a log-normally distributed random variable, with mean $\mathrm{E}[Y_t]=Y_0 e^{\mu t}$ and variance $\mathrm{Var}[Y_t]=Y_0^2 e^{2\mu t} \left( e^{\sigma^2 t} - 1 \right)$.
+
+Here, we integrate the stochastic differential equation using the Euler-Maruyama method, which is described in more details in the vignette describing the Orstein-Uhlenbeck process. 
+
+Let's see how to generate geometric Brownian motion path (or realizations):
+
+```{r, echo=TRUE}
+library(tsmodels)
+
+T <- 100
+dt <- 0.01
+mu <- 0.05
+sigma <- 0.1
+Y0 <- 50
+
+result <- geometric_Brownian_motion(T=T, dt=dt, mu=mu, sigma=sigma, Y0=Y0)
+t1 <- result[[1]]
+Y1 <- result[[2]]
+length(Y1)
+```
+
+Let's plot the results. We need to load tidyverse to use ggplot2
+
+```{r echo=TRUE, message=FALSE}
+library(tidyverse)
+```
+
+```{r, echo=TRUE}
+ggplot()+
+    geom_line(mapping = aes(x=t1, y=Y1), color="black")
+```
+
+Let's check if the statistical properties match what we are expecting. Let's begin by calculating the rolling returns over 100 time steps, corresponding to 1 unit of time:
+
+```{r echo=TRUE, message=FALSE}
+n <- round(1/dt)
+N <- length(Y1)
+returns <- (Y1[(n+1):N]-Y1[1:(N-n)])/Y1[1:(N-n)]
+mean(returns)
+sd(returns)
+```
+
+The mean and standard deviation of the returns match our specifications. Let's now examine the full returns sample, which should be normally distributed.  For that, we construct the qq plot, showing theoretical (for a normal distribution) vs sample quantiles:
+
+```{r, echo=TRUE}
+ggplot(mapping=aes(sample=returns))+
+  stat_qq()+
+  stat_qq_line()
+```
+
+The deviations from set parameters are essentially due to sample fluctuations.
+

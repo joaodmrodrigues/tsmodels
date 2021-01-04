@@ -4,14 +4,16 @@
 \alias{Ornstein_Uhlenbeck}
 \title{Ornstein-Uhlenbeck process}
 \usage{
-Ornstein_Uhlenbeck(N, sigma, mu, tau, Y0)
+Ornstein_Uhlenbeck(T, dt, mu, sigma, tau, Y0)
 }
 \arguments{
-\item{N}{number of time steps}
+\item{T}{total time}
 
-\item{sigma}{standard deviation of the stochastic term, over 1 time unit (over 1 time step, given the normalization dt=1)}
+\item{dt}{time step}
 
 \item{mu}{mean}
+
+\item{sigma}{standard deviation of the stochastic term, over 1 time unit}
 
 \item{tau}{reverting time constant}
 
@@ -27,5 +29,5 @@ The time and the process realization vectors
 \description{
 Simulates an Ornstein-Uhlenbeck stochastic realization
 The Ornstein-Uhlenbeck process is the canonical model of a mean-reverting process.
-Time step is taken as 1 (dt=1).
+It is often used to model the spread in a pairs trading strategy.
 }
