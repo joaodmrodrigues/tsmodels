@@ -9,6 +9,9 @@ models. The current version includes:
   - Ornstein-Uhlenbeck process (models spread of pairs-trading
     strategies, etc)
 
+  - Geometric Ornstein-Uhlenbeck process (models mean-reverting price
+    series, etc)
+
   - Geometric Brownian motion (models stock prices, indices, etc)
 
   - etc
