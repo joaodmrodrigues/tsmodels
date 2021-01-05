@@ -1,0 +1,54 @@
+---
+title: "Geometric Ornstein-Uhlenbeck process"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Geometric Ornstein-Uhlenbeck process}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4) 
+```
+
+This document describes the fundamentals of the geometric Ornstein-Uhlenbeck (OU) process and its implementation in the **tsmodels** package.
+
+The geometric Ornstein-Uhlenbeck (OU) process, like its classical version, models mean-reverting stochastic processes. It is stationary, Gaussian and Markov. Mathematically, we can define the geometric OU process via the Langevin stochastic differential equation
+$$dY_t = - \frac{(Y_t-\mu)}{\tau}dt + \sigma Y_t dW_t.$$
+
+Here, because of the geometric nature of the stochastic term, $\mu$ and $\sigma$ are not directly the process mean and standard deviation, although they are related. As usual $W$ is a Brownian motion (or Wiener process).  
+
+While the paths in the classic OU process can be negative in value, in the geometric version the process is always positive semi-definite. This means that we can model a mean-reverting price time series via the geometric version of the Ornstein-Ulhenbeck process. 
+
+Here, we integrate the above stochastic differential equation using the Euler-Maruyama method, which is described in more details in the vignette describing the classic Ornstein-Uhlenbeck process. 
+
+Let's see how to generate realizations of the geometric OU process:
+
+
+```{r, echo=TRUE}
+library(tsmodels)
+
+T <- 100
+dt <- 0.01
+mu <- 5.0
+sigma <- 1.0
+tau <- 5
+Y0 <- 10
+
+result <- geometric_Ornstein_Uhlenbeck(T=T, dt=dt, mu=mu, sigma=sigma, tau=tau, Y0=Y0)
+t <- result[[1]]
+Y <- result[[2]]
+```
+
+Let's plot the results. We need to load the **tidyverse** package to use ggplot2
+
+```{r echo=TRUE, message=FALSE}
+library(tidyverse)
+```
+
+```{r, echo=TRUE}
+ggplot()+
+    geom_line(mapping = aes(x=t, y=Y), color="black")
+```

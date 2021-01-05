@@ -2,3 +2,4 @@
 
 export(Ornstein_Uhlenbeck)
 export(geometric_Brownian_motion)
+export(geometric_Ornstein_Uhlenbeck)

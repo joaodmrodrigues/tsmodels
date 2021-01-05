@@ -17,13 +17,13 @@ This document describes the fundamentals of the Ornstein-Uhlenbeck (OU) process 
 
 The Ornstein-Uhlenbeck (OU) is the canonical model of a mean-reverting stochastic process. It is stationary, Gaussian and Markov. Mathematically, we can define the OU process via the Langevin stochastic differential equation
 $$dY_t = - \frac{(Y_t-\mu)}{\tau}dt + \sigma \sqrt{\frac{2}{\tau}} dW_t.$$
-Here, $Y(t)$ is the stochastic process, $\mu$ and $\sigma$ the process mean and standard deviation, respectively, and $W$ is a Brownian motion (or Wiener process). The first term on the r.h.s. is deterministic, describing damping, or reversion to the mean, while the second term describes the stochastic component.
+Here, $Y_t=Y(t)$ is the stochastic process, $\mu$ and $\sigma$ the process mean and standard deviation, respectively, and $W$ is a Brownian motion (or Wiener process). The first term on the r.h.s. is deterministic, describing damping, or reversion to the mean, while the second term describes the stochastic component.
 
 Here, we integrate the above stochastic differential equation using the Euler-Maruyama method, which is essentially a generalization of the Euler method, but capable of dealing with Brownian motion terms. In general, the solution to a general equation of the form
-$$ dY_t = a(t,Y)dt + b(t,Y)dW_t$$
+$$ dY_t = a(t,Y_t)dt + b(t,Y_t)dW_t$$
 can be approximated by
 $$Y_{t+dt} = Y_t + dY_t = Y_t + a(t, Y_t)dt + b(t, Y_t)\sqrt{dt} \xi, $$
-where $\xi \sim N(0,1)$ is a random normal variable of zero mean and unit variance. The $\sqrt{dt}$ factor simply scales the variance of the Brownian motion term. Remember that, Brownian motion is defined such that its infinitesimal increments have mean zero and variance $dt$ (or standard deviation $\sqrt{dt}$).
+where $\xi \sim N(0,1)$ is a random normal variable of zero mean and unit variance. The $\sqrt{dt}$ factor simply scales the variance of the normal distribution. Remember that, Brownian motion is defined such that its infinitesimal increments have mean zero and variance $dt$ (or standard deviation $\sqrt{dt}$).
 
 Let's see how to generate realizations of the OU process:
 
@@ -43,7 +43,7 @@ Y1 <- result[[2]]
 length(Y1)
 ```
 
-Let's plot the results. We need to load tidyverse to use ggplot2
+Let's plot the results. We need to load the **tidyverse** package to use ggplot2
 
 ```{r echo=TRUE, message=FALSE}
 library(tidyverse)
@@ -54,7 +54,9 @@ ggplot()+
     geom_line(mapping = aes(x=t1, y=Y1), color="black")
 ```
 
-There is a transient regime, given that we initialize the integration with a value very far from the process mean. After the damping time of approximately $\tau$, the process becomes stationary. We can check the process statistics now. Let's consider the case where the initial condition is equal to the process mean, to avoid the initial transient regime. Let's also consider longer path times, to have to stable statistics:
+There is a transient regime, given that we initialize the integration with a value very far from the process mean. After the damping time of approximately $\tau$, the process becomes stationary. 
+
+We can check the process statistics now. Let's consider the case where the initial condition is equal to the process mean, to avoid the initial transient regime. Let's also consider longer path times, to have to stable statistics:
 
 ```{r, echo=TRUE}
 T <- 1000
